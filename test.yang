@@ -1,0 +1,84 @@
+/*
+ * Test file with syntactically correct YANG
+ * Mostly cut&paste from the RFC
+ */
+module my-extensions {
+  revision 2017-11-03;
+  extension c-define {
+    description
+      "Takes as argument a name string.
+      Makes the code generator use the given name in the
+      #define.";
+    argument "name";
+  }
+}
+
+module my-interfaces {
+
+  import my-extensions {
+    prefix "myext";
+  }
+
+  container interfaces {
+    myext:c-define "MY_INTERFACES";
+  }
+}
+
+
+module syslog {
+  feature local-storage {
+    description
+      "This feature means the device supports local
+      storage (memory, flash or disk) that can be used to
+      store syslog messages.";
+  }
+
+  container syslog {
+    leaf local-storage-limit {
+      if-feature local-storage;
+      type uint64;
+      units "kilobyte";
+      config false;
+      description
+        "The amount of local storage that can be
+        used to hold syslog messages.";
+    }
+  }
+}
+
+deviation /base:system/base:user/base:type {
+  deviate add {
+    default "admin"; // new users are 'admin' by default
+  }
+  deviate replace {
+    max-elements 3;
+    // legal values for numbers
+    min-elements +4711;  // legal positive value
+    min-elements 4711;   // legal positive value
+    min-elements -123;   // legal negative value
+    min-elements 0xf00f; // legal positive hexadecimal value
+    min-elements -0xf;   // legal negative hexadecimal value
+    min-elements 052;    // legal positive octal value
+    // TODO: detect error in 'min-elements - 2;'
+  }
+}
+
+typedef my-base-int32-type {
+  type int32 {
+    range "1..4 | 10..20";
+  }
+}
+
+typedef my-type1 {
+  type my-base-int32-type {
+    // legal range restriction
+    range "11..max"; // 11..20
+  }
+}
+
+typedef my-decimal {
+  type decimal64 {
+    fraction-digits 2;
+    range "1 .. 3.14 | 10 | 20..max";
+  }
+}
