@@ -21,94 +21,72 @@ local line_comment = '//' * l.nonnewline_esc^0
 local block_comment = '/*' * (l.any - '*/')^0 * P('*/')^-1
 local comment = token(l.COMMENT, line_comment + block_comment)
 
--- Strings are double quouted
-local dq_str = P('L')^-1 * l.delimited_range('"', true)
-local string = token(l.STRING, dq_str)
+-- Strings are double quouted and can be multiline (!)
+local dqm_str = l.delimited_range('"', false)
+local string = token(l.STRING, dqm_str)
 
 -- Numbers.
 local number = token(l.NUMBER, l.float + l.integer)
 
+local operator = token(l.OPERATOR, S(';{}'))
+
 -- Identifiers.
-local identifier = token(l.IDENTIFIER, (R("09","AZ","az") + P('-'))^1)
+local simple_ident = (R("09","AZ","az") + S('-'))^1
+local identifier = token(l.IDENTIFIER, simple_ident)
+
+-- Derived types
+local _class = (simple_ident * (S(':') * simple_ident)^1)
+local class = token(l.CLASS, _class)
+
+local func = token(l.FUNCTION, (S('/') * _class * (S('/') * _class)^0))
 
 -- Datetime.
-local ts = token('timestamp', l.digit * l.digit * l.digit * l.digit * -- year
-                              '-' * l.digit * l.digit * -- month
-                              '-' * l.digit * l.digit -- day 
+local ts = token('custom_ts', 
+  l.digit * l.digit * l.digit * l.digit * -- year
+  '-' * l.digit * l.digit * -- month
+  '-' * l.digit * l.digit -- day 
 )
 
 -- kewwords.
-local keyword = token(l.KEYWORD, word_match{
-  'anyxml',
-  'argument',
-  'augment',
-  'base',
-  'belongs-to',
-  'bit',
-  'case',
-  'choice',
-  'config',
-  'contact',
-  'container',
-  'default',
-  'description',
-  'deviate',
-  'deviation',
-  'enum',
-  'error-app-tag',
-  'error-message',
-  'extension',
+local keyword = token(l.KEYWORD, (word_match ({
+  'anyxml',  'argument',  'augment',
+  'base',  'bit',
+  'case',  'choice',  'config',  'contact',  'container',
+  'default',  'description',  'deviate',  'deviation',
+  'enum',  'extension',
   'feature',
-  'fraction-digits',
   'grouping',
-  'identity',
-  'if-feature',
-  'import',
-  'include',
-  'input',
+  'identity',  'import',  'include',  'input',
   'key',
-  'leaf',
-  'leaf-list',
-  'length',
-  'list',
-  'mandatory',
-  'max-elements',
-  'min-elements',
-  'module',
-  'must',
-  'namespace',
-  'notification',
-  'ordered-by',
-  'organization',
-  'output',
-  'path',
-  'pattern',
-  'position',
-  'prefix',
-  'presence',
-  'range',
-  'reference',
-  'refine',
-  'require-instance',
-  'revision',
-  'revision-date',
-  'rpc',
-  'status',
-  'submodule',
-  'type',
-  'typedef',
-  'unique',
-  'units',
-  'uses',
+  'leaf',  'length',  'list',
+  'mandatory',  'module',  'must',
+  'namespace',  'notification',
+  'organization',  'output',
+  'path',  'pattern',  'position',  'prefix',  'presence',
+  'range',  'reference',  'refine',  'revision',  'rpc',
+  'status',  'submodule',
+  'type',  'typedef',
+  'unique',  'units',  'uses',
   'value',
-  'when',
-  'yang-version',
-  'yin-element'
+  'when' }) + word_match({
+  'belongs-to',
+  'error-app-tag',  'error-message',
+  'fraction-digits',
+  'if-feature',
+  'leaf-list',
+  'min-elements',  'max-elements',
+  'ordered-by',
+  'require-instance',  'revision-date',
+  'yang-version',  'yin-element'
+},'-')))
+
+-- builtin integer types
+
+local builtin_types = token(l.TYPE, word_match{
+  'int8',   'int16',   'int32',   'int64',
+  'uint8',  'uint16',  'uint32',  'uint64'
 })
-
--- Identifiers.
-local identifier = token(l.IDENTIFIER, l.word)
-
+   
 M._rules = {
   {'whitespace', ws},
   {'comment', comment},
@@ -116,11 +94,17 @@ M._rules = {
   {'timestamp', ts},
   {'string', string},
   {'number', number},
+  {'function', func},
+  {'type', builtin_types},
+  {'class', class},
   {'identifier', identifier},
+  {'operator', operator},
+  {'error', token(l.ERROR, l.any)},
 }
 
+local italic_number_style = l.STYLE_NUMBER .. ',italics'
 M._tokenstyles = {
-  timestamp = l.STYLE_NUMBER,
+  custom_ts = italic_number_style
 }
 
 M._FOLDBYINDENTATION = true
