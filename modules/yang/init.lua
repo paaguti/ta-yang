@@ -7,20 +7,17 @@ local M = {}
 -- The makefile module.
 -- It provides utilities for editing Makefiles.
 --
--- ## Key Bindings
---
--- + `Ctrl+L, M` (`⌘L, M` on Mac OSX | `M-L, M` in curses)
---   Open this module for editing.
 -- @field sense
---   The makefile [Adeptsense](textadept.adeptsense.html).
+--   The makefile [Adeptsense](textadept.adeptsense.yang).
 --   empty for the moment being
 
-module('_M.xml')]]
+module('_M.yang')]]
 
+-- TODO:
 -- Compile and Run command tables use file extensions.
--- textadept.run.compile_command.makefile =
+-- textadept.run.compile_command.yang =
 --  'make  -f %(filename)'
--- textadept.run.error_detail.makefile = {
+-- textadept.run.error_detail.yang = {
 --  pattern = '^(.-):(%d+): (.+)$',
 --  filename = 1, line = 2, message = 3
 -- }
@@ -32,28 +29,26 @@ module('_M.xml')]]
 -- Commands.
 
 ---
--- Table of XML-specific key bindings.
+-- Table of YANG-specific key bindings.
 -- @class table
--- @name _G.keys.xml
+-- @name _G.keys.yang
 keys.yang = {
---  [keys.LANGUAGE_MODULE_PREFIX] = {
---    m = {io.open_file,
---         (_HOME..'/modules/xml/init.lua'):iconv('UTF-8', _CHARSET)},
---  },
---  ['s\n'] = function()
---    buffer:line_end()
---    buffer:add_text(';')
---    buffer:new_line()
- -- end,
+	['s\n'] = function()
+    buffer:line_end()
+    buffer:add_text(';')
+    buffer:new_line()
+	end,
+  ['{'] = function() return common.enclose_keys('{', '}') end,
+  ['('] = function() return common.enclose_keys('(', ')') end,
 
 }
 
 -- Snippets.
 
 ---
--- Table of XML-specific snippets.
+-- Table of YANG-specific snippets.
 -- @class table
--- @name _G.snippets.xml
+-- @name _G.snippets.yang
 if type(snippets) == 'table' then
   snippets.yang = {
   }
