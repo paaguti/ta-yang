@@ -15,7 +15,7 @@ local M = {}
 --   The makefile [Adeptsense](textadept.adeptsense.html).
 --   empty for the moment being
 
-module('_M.xml')]]
+module('_M.yang')]]
 
 -- Compile and Run command tables use file extensions.
 -- textadept.run.compile_command.makefile =
@@ -32,28 +32,18 @@ module('_M.xml')]]
 -- Commands.
 
 ---
--- Table of XML-specific key bindings.
+-- Table of YANG-specific key bindings.
 -- @class table
--- @name _G.keys.xml
+-- @name _G.keys.yang
 keys.yang = {
---  [keys.LANGUAGE_MODULE_PREFIX] = {
---    m = {io.open_file,
---         (_HOME..'/modules/xml/init.lua'):iconv('UTF-8', _CHARSET)},
---  },
---  ['s\n'] = function()
---    buffer:line_end()
---    buffer:add_text(';')
---    buffer:new_line()
- -- end,
-
 }
 
 -- Snippets.
 
 ---
--- Table of XML-specific snippets.
+-- Table of YANG-specific snippets.
 -- @class table
--- @name _G.snippets.xml
+-- @name _G.snippets.yang
 if type(snippets) == 'table' then
   snippets.yang = {
   }
