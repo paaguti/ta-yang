@@ -7,20 +7,17 @@ local M = {}
 -- The makefile module.
 -- It provides utilities for editing Makefiles.
 --
--- ## Key Bindings
---
--- + `Ctrl+L, M` (`⌘L, M` on Mac OSX | `M-L, M` in curses)
---   Open this module for editing.
 -- @field sense
---   The makefile [Adeptsense](textadept.adeptsense.html).
+--   The makefile [Adeptsense](textadept.adeptsense.yang).
 --   empty for the moment being
 
 module('_M.yang')]]
 
+-- TODO:
 -- Compile and Run command tables use file extensions.
--- textadept.run.compile_command.makefile =
+-- textadept.run.compile_command.yang =
 --  'make  -f %(filename)'
--- textadept.run.error_detail.makefile = {
+-- textadept.run.error_detail.yang = {
 --  pattern = '^(.-):(%d+): (.+)$',
 --  filename = 1, line = 2, message = 3
 -- }
